@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カラーパレットジェネレーター PRO | 配色パターンを自動生成</title>
+    <meta name="description" content="ベースカラーを選ぶだけで、補色・類似色・トライアド・モノクロなど5種類の配色パターンを自動生成。Webデザイナー・クリエイター向け無料ツール。">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(280, 40%, 10%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(300, 39%, 15%, 0.2) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(250, 49%, 15%, 0.2) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #f472b6, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .color-swatch {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .copied-toast {
+            animation: fadeInOut 1.5s ease forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            appearance: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+    </style>
+    <!-- Google Search Console 所有権確認用メタタグ -->
+    <meta name="google-site-verification" content="ECNA6rCMysSFdAgO_tGT5OFHiEhy1hy99Dxd0-k-lWQ" />
+    <!-- Google AdSense 審査・所有権確認用コード -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5383957100145583"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight"><span class="gradient-text">Color
+                    Palette</span> PRO</h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">ベースカラーを1つ選ぶだけ。5種類の美しい配色パターンを自動生成します。</p>
+        </div>
+
+        <div class="mb-10 text-center flex justify-center w-full min-h-[90px]">
+            <!-- ■■■ 広告タグ貼り付け位置（トップ） ■■■ -->
+        </div>
+
+        <div id="root"></div>
+
+        <!-- --- SEO対策用の解説テキストエリア --- -->
+        <div class="mt-16 pt-12 border-t border-slate-800/80">
+            <section class="mb-12">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white flex items-center">
+                    <span class="w-1.5 h-8 bg-pink-500 rounded-full mr-4 inline-block"></span>
+                    Color Palette PRO とは？
+                </h2>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-base">
+                    <p>
+                        「Color Palette
+                        PRO」は、<strong>ベースカラーを1つ選ぶだけで、色彩理論に基づいた5種類の配色パターン（補色・類似色・トライアド・スプリットコンプリメンタリー・モノクロ）を自動生成する無料のWebツール</strong>です。
+                    </p>
+                    <p>
+                        Webサイトのデザイン、プレゼンテーション資料の作成、SNSの投稿画像の制作など、「色の組み合わせ」に悩むすべてのクリエイターに向けて設計されています。配色の専門知識がなくても、プロフェッショナルな色使いを実現できます。
+                    </p>
+                    <p>
+                        生成された各カラーコード（HEX値）はクリック一つでコピー可能。デザインソフトやCSSにすぐ反映できます。
+                    </p>
+                </div>
+            </section>
+
+            <section class="mb-12">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white flex items-center">
+                    <span class="w-1.5 h-8 bg-violet-500 rounded-full mr-4 inline-block"></span>
+                    配色パターンの種類
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="bg-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
+                        <h3 class="text-lg font-bold text-white mb-2">🎨 補色（Complementary）</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            色相環で正反対に位置する色同士の組み合わせ。コントラストが強く、パンチのある印象を与えます。CTAボタンや見出しに効果的です。</p>
+                    </div>
+                    <div
+                        class="bg-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
+                        <h3 class="text-lg font-bold text-white mb-2">🌈 類似色（Analogous）</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            色相環で隣り合う色の組み合わせ。調和がとりやすく、落ち着いた雰囲気を演出します。ブランドカラーやWebサイト全体の統一感に最適。</p>
+                    </div>
+                    <div
+                        class="bg-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
+                        <h3 class="text-lg font-bold text-white mb-2">🔺 トライアド（Triadic）</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            色相環を三等分した位置にある3色の組み合わせ。バランスが良く、多色使いでも洗練された印象を保てます。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-4">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white flex items-center">
+                    <span class="w-1.5 h-8 bg-indigo-500 rounded-full mr-4 inline-block"></span>
+                    よくある質問（FAQ）
+                </h2>
+                <div class="bg-slate-800/30 rounded-xl border border-slate-700/50 p-6 md:p-8 space-y-6">
+                    <div>
+                        <h3 class="text-white font-semibold mb-2">Q. 商用利用しても問題ありませんか？</h3>
+                        <p class="text-slate-400 text-sm">はい。当ツールで生成した配色パターンは、Webサイト・アプリ・印刷物など、商用を含むすべての用途に自由にお使いいただけます。
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold mb-2">Q. カラーコードはどの形式ですか？</h3>
+                        <p class="text-slate-400 text-sm">HEX形式（例: #FF5733）で出力されます。CSSやデザインソフト（Figma,
+                            Canvaなど）にそのまま貼り付けて利用可能です。</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="mt-12 text-center flex justify-center w-full min-h-[250px]">
+            <!-- ■■■ 広告タグ貼り付け位置（ボトム） ■■■ -->
+        </div>
+    </div>
+
+    <script type="text/babel">
+        // --- Color Utility Functions ---
+        function hexToHSL(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+        }
+
+        function hslToHex(h, s, l) {
+            h = ((h % 360) + 360) % 360;
+            s = Math.max(0, Math.min(100, s)) / 100;
+            l = Math.max(0, Math.min(100, l)) / 100;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function generatePalettes(baseHex) {
+            const [h, s, l] = hexToHSL(baseHex);
+            return {
+                complementary: {
+                    name: '補色（Complementary）',
+                    desc: '正反対の色。強いコントラスト',
+                    colors: [
+                        { hex: baseHex, label: 'ベース' },
+                        { hex: hslToHex(h + 180, s, l), label: '補色' },
+                        { hex: hslToHex(h, s, Math.min(l + 20, 95)), label: 'ライト' },
+                        { hex: hslToHex(h + 180, s, Math.min(l + 20, 95)), label: '補色ライト' },
+                        { hex: hslToHex(h, s, Math.max(l - 20, 5)), label: 'ダーク' },
+                    ]
+                },
+                analogous: {
+                    name: '類似色（Analogous）',
+                    desc: '隣り合う色。統一感と調和',
+                    colors: [
+                        { hex: hslToHex(h - 30, s, l), label: '-30°' },
+                        { hex: hslToHex(h - 15, s, l), label: '-15°' },
+                        { hex: baseHex, label: 'ベース' },
+                        { hex: hslToHex(h + 15, s, l), label: '+15°' },
+                        { hex: hslToHex(h + 30, s, l), label: '+30°' },
+                    ]
+                },
+                triadic: {
+                    name: 'トライアド（Triadic）',
+                    desc: '120°間隔の3色。バランスの良い多色',
+                    colors: [
+                        { hex: baseHex, label: 'ベース' },
+                        { hex: hslToHex(h + 120, s, l), label: '+120°' },
+                        { hex: hslToHex(h + 240, s, l), label: '+240°' },
+                        { hex: hslToHex(h, Math.max(s - 20, 10), Math.min(l + 15, 90)), label: 'ソフト' },
+                        { hex: hslToHex(h + 120, Math.max(s - 20, 10), Math.min(l + 15, 90)), label: 'ソフト+120°' },
+                    ]
+                },
+                splitComplementary: {
+                    name: 'スプリット（Split-Comp）',
+                    desc: '補色の両隣。メリハリ＋調和',
+                    colors: [
+                        { hex: baseHex, label: 'ベース' },
+                        { hex: hslToHex(h + 150, s, l), label: '+150°' },
+                        { hex: hslToHex(h + 210, s, l), label: '+210°' },
+                        { hex: hslToHex(h, s, Math.min(l + 25, 95)), label: 'ライト' },
+                        { hex: hslToHex(h, s, Math.max(l - 25, 5)), label: 'ダーク' },
+                    ]
+                },
+                monochromatic: {
+                    name: 'モノクロ（Monochromatic）',
+                    desc: '同一色相の濃淡。洗練された統一感',
+                    colors: [
+                        { hex: hslToHex(h, s, Math.min(l + 30, 95)), label: '最も明るい' },
+                        { hex: hslToHex(h, s, Math.min(l + 15, 90)), label: '明るい' },
+                        { hex: baseHex, label: 'ベース' },
+                        { hex: hslToHex(h, s, Math.max(l - 15, 10)), label: '暗い' },
+                        { hex: hslToHex(h, s, Math.max(l - 30, 5)), label: '最も暗い' },
+                    ]
+                },
+            };
+        }
+
+        const App = () => {
+            const [baseColor, setBaseColor] = React.useState('#6366f1');
+            const [copiedHex, setCopiedHex] = React.useState(null);
+
+            const palettes = generatePalettes(baseColor);
+
+            const copyHex = (hex) => {
+                navigator.clipboard.writeText(hex);
+                setCopiedHex(hex);
+                setTimeout(() => setCopiedHex(null), 1500);
+            };
+
+            const randomColor = () => {
+                const hex = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                setBaseColor(hex);
+            };
+
+            const presets = ['#6366f1', '#ef4444', '#f59e0b', '#10b981', '#ec4899', '#06b6d4', '#8b5cf6', '#f97316'];
+
+            return (
+                <div className="space-y-8">
+                    {/* カラー選択エリア */}
+                    <div className="glass rounded-2xl p-6 shadow-xl">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center">
+                            <span className="mr-2">🎨</span> ベースカラーを選択
+                        </h2>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <input
+                                type="color"
+                                value={baseColor}
+                                onChange={(e) => setBaseColor(e.target.value)}
+                                className="w-16 h-16 rounded-xl cursor-pointer"
+                            />
+                            <div className="flex flex-col">
+                                <input
+                                    type="text"
+                                    value={baseColor}
+                                    onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setBaseColor(e.target.value); }}
+                                    className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-mono text-lg w-32 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                    maxLength={7}
+                                />
+                            </div>
+                            <button onClick={randomColor} className="bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:shadow-pink-500/30 transition-all transform hover:-translate-y-0.5">
+                                🎲 ランダム
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-4">
+                            {presets.map(p => (
+                                <button
+                                    key={p}
+                                    onClick={() => setBaseColor(p)}
+                                    className="w-8 h-8 rounded-lg border-2 border-transparent hover:border-white/50 transition-all transform hover:scale-110"
+                                    style={{ backgroundColor: p }}
+                                    title={p}
+                                ></button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* パレット表示 */}
+                    {Object.values(palettes).map((palette) => (
+                        <div key={palette.name} className="glass rounded-2xl p-6 shadow-xl">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-bold text-white">{palette.name}</h3>
+                                <p className="text-sm text-slate-400">{palette.desc}</p>
+                            </div>
+                            <div className="grid grid-cols-5 gap-3">
+                                {palette.colors.map((c, i) => (
+                                    <div key={i} className="color-swatch" onClick={() => copyHex(c.hex)}>
+                                        <div
+                                            className="w-full aspect-square rounded-xl mb-2 relative overflow-hidden"
+                                            style={{ backgroundColor: c.hex }}
+                                        >
+                                            {copiedHex === c.hex && (
+                                                <div className="copied-toast absolute inset-0 flex items-center justify-center bg-black/50 text-white text-xs font-bold rounded-xl">
+                                                    ✓ コピー
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-xs font-mono text-slate-300">{c.hex.toUpperCase()}</div>
+                                            <div className="text-xs text-slate-500">{c.label}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* CSSコード出力 */}
+                    <div className="glass rounded-2xl p-6 shadow-xl">
+                        <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+                            <span className="mr-2">📋</span> CSSカスタムプロパティ（コピーしてすぐ使える）
+                        </h3>
+                        <div className="relative">
+                            <pre className="bg-slate-900/80 rounded-xl p-4 text-sm font-mono text-slate-300 overflow-x-auto">
+                                {`:root {
+  --color-primary: ${baseColor};
+  --color-complementary: ${palettes.complementary.colors[1].hex};
+  --color-analogous-1: ${palettes.analogous.colors[0].hex};
+  --color-analogous-2: ${palettes.analogous.colors[4].hex};
+  --color-light: ${palettes.monochromatic.colors[0].hex};
+  --color-dark: ${palettes.monochromatic.colors[4].hex};
+}`}
+                            </pre>
+                            <button
+                                onClick={() => {
+                                    const css = `:root {\n  --color-primary: ${baseColor};\n  --color-complementary: ${palettes.complementary.colors[1].hex};\n  --color-analogous-1: ${palettes.analogous.colors[0].hex};\n  --color-analogous-2: ${palettes.analogous.colors[4].hex};\n  --color-light: ${palettes.monochromatic.colors[0].hex};\n  --color-dark: ${palettes.monochromatic.colors[4].hex};\n}`;
+                                    navigator.clipboard.writeText(css);
+                                    alert('CSSをコピーしました！');
+                                }}
+                                className="absolute top-3 right-3 text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-200 transition-colors"
+                            >
+                                コピー
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
